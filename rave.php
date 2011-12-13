@@ -12,9 +12,9 @@
 if (!class_exists('Rave')) {
 class Rave {
 
-
 	/**
 	 * Rave::is_human        Test if an unknown variable is a type for humans: string or numeric.
+	 *
 	 * @param    mixed       $ukn is the unknown that you want to test.
 	 * @return   boolean     true  for strings|numbers (including '' and 0)
 	 *                       false for arrays|objects|null|booleans
@@ -27,8 +27,8 @@ class Rave {
 
 
 	/**
-	 * Rave::humanize            Test input with Rave::is_human. Return humans unchanged.
-	 *                           Convert non humans to ''.
+	 * Rave::humanize            Test input w/ Rave::is_human. If human, return it. If not, return ''.
+	 *
 	 * @param   mixed            $ukn is a variable of unknown type you want to humanize.
 	 * @return  string|number    the original input, or '' if input was not string|number.
 	 *
@@ -38,6 +38,7 @@ class Rave {
 	 *  Rave::humanize(array(8))  #  ''
 	 *  Rave::humanize(null)      #  ''
 	 *  Rave::humanize(true)      #  ''
+	 *  Rave::humanize(0)         #  0
 	 */
 	public static function humanize($ukn) {
 		return self::is_human($ukn) ? $ukn : '';
@@ -93,6 +94,7 @@ class Rave {
 	 *                           
 	 */
 	public static function is_void($ukn) {
+		
 		return !isset($ukn) || !is_string($ukn) || '' === trim($ukn); // boolean
 	}
 
@@ -104,6 +106,7 @@ class Rave {
 	 * @return   boolean
 	*/
 	public static function is_literal($ukn) {
+		
 		if ( !isset($ukn) ) {
 			return false;
 		}
@@ -137,15 +140,20 @@ class Rave {
 	 *
 	 */	
 	public static function ok_id($ukn) {
+		
 		// First char must be letter or underscore. Allow alpanumeric|dash|underscore in the rest.
 		return !self::is_void($ukn) && 0 === preg_match('/^[^a-zA-Z_]|[^a-zA-Z0-9_\-]/', $ukn);
 	}
 
 
 	/**
-	 * Rave::ok_var
+	 * Rave::ok_var              Check if input is an allowed name for a JavaScript variable.
+	 * 
+	 * @param   mixed     $ukn   is the unknown variable to test.
+	 * @return  boolean          true if okay, false if not.
 	 */	
 	public static function ok_var($ukn) {
+		
 		// First char must be letter or underscore. Allow alpanumeric|underscore in the rest.
 		return !self::is_void($ukn) && 0 === preg_match('/^[^a-zA-Z_]|[^a-zA-Z0-9_]/', $ukn);
 	}
@@ -154,10 +162,12 @@ class Rave {
 	/**
 	 * Rave::to_var
 	 *
-	 * @param   string       $str
-	 * @param   boolean      $camelcase
-	 * $param   integer      $offset
-	 * return   string|false              
+	 * @param   string        $str
+	 * @param   boolean       $camelcase
+	 * @param   integer       $offset
+	 * @return  string|false              
+	 *
+	 *
 	 *
 	 */		
 	public static function to_var($str, $camelcase = false, $offset = 1) {
@@ -203,6 +213,7 @@ class Rave {
 	 * @return  string           is the wrapped code
 	 */
 	public static function cdata($code, $break = "\n", $indent = "\t") {
+		
 		return isset($code) ? '/*<![CDATA[*/' . $break . $code . $break . $indent . '/*]]>*/' : $code;
 	}
 
@@ -216,6 +227,7 @@ class Rave {
 	 *
 	 */
 	public static function mirror($char) {
+		
 		$conversions = array( '[' => ']'
 		                    , '{' => '}'
 		                    , ']' => '['
@@ -225,6 +237,7 @@ class Rave {
 		                    , '<' => '>'
 		                    , '>' => '<'
 		                    );
+		                    
 		return isset($conversions[$char]) ? $conversions[$char] : $char;
 	}
 
@@ -316,13 +329,14 @@ class Rave {
 	 *
 	 */
 	public static function quote($code, $quote = '"') {
+		
 		if ( !isset($code) || !is_string($code) || self::is_literal($code) ) { 
-			return $code; 
+			return $code; // Return if not a string or if meant to be a literal.
 		}
+		
 		else {
 			$quote = substr($quote, 0, 1);                // Ensure $quote is only 1 character.
 			return $quote . trim($code, $quote) . $quote; // Trim before joining to prevent quoting twice.
-
 		}
 	}
 
@@ -340,6 +354,7 @@ class Rave {
 	 *  Rave::reboud('"[  ]"')  #  '[  ]'
 	 *  Rave::reboud('"true"')  #  'true'
 	 *  Rave::reboud('"1000"')  #  '1000'
+	 *
 	 */
 	public static function rebound($js) {
 		//                     ( $1  )( ===================================================================  $2  ============================================================================ )( $3  )
@@ -349,7 +364,7 @@ class Rave {
 
 
 	/**
-	 * Rave::unfold
+	 * Rave::unfold                  Unfold a block of (JavaScript) code. (Add line breaks and tabs.)
 	 *
 	 * @param   string    $js        is the code (usually JavaScript) to unfold.
 	 * @param   string    $break     is the linebreak between lines. Default: "\n"
@@ -360,7 +375,10 @@ class Rave {
 	 * 
 	 */
 	public static function unfold($js, $break = "\n", $indent = "\t", $offset = "\t", $wrap = "\n\t") {
+		
 		$break .= $offset; // Keep offset param separate for future options.
+		
+		// Hmm...
 		$replace = array( '},{' => $break . '}!comma! {' . $break . $indent
 						, '([{' => '([{' . $break . $indent
 						, '}])' => $break . '}])'
@@ -369,9 +387,11 @@ class Rave {
 						, "],"  => "]," . $break . $indent 
 						, '}!comma!'  => '},' 
 						);
+						
 		foreach (array_keys($replace) as $needle) {
 			$js = str_replace($needle, $replace[$needle], $js);
 		}
+		
 		return $wrap . $js . $wrap;
 	}
 
@@ -390,14 +410,18 @@ class Rave {
 	 * @param   string|number|boolean   $right  gets appended to each of $arr's values.
 	 *                                          When $right === true (default behavior), $right
 	 *                                          will match $left. For none, set to '' or false.
-	 * @return  array                           the updated array, or unchanged $arr for non-arrays
+	 *
+	 * @return  array                           the updated array, or unchanged $arr for non-arrays.
+	 *
 	 */
 	public static function affix($arr, $left = false, $right = true) {
+		
 		if ( isset($arr) && is_array($arr) ) {
 			foreach ( $arr as &$a ) {
 				$a = Rave::pad($a, $left, $right);
 			}
 		}
+		
 		return $arr;
 	}
 
@@ -408,12 +432,14 @@ class Rave {
 	 *                               functions that support mixed inputs.
 	 * @param   mixed    $ukn        is the variable of unknown type that you to convert to an array.
 	 * @param   string   $delimiter  is an optional delimiter used to explode string|numeric inputs.
+	 *
 	 * @return  array
 	 *
 	 * @example
 	 *  Rave::to_array('abc')         #  array('abc')      // cast to array
 	 *  Rave::to_array('abc', 'b')    #  array('a', 'c')   // exploded to array
 	 *  Rave::to_array(array('abc'))  #  array('abc')      // already an array
+	 *
 	*/
 	public static function to_array($ukn, $delimiter = false) {
 	
@@ -488,6 +514,7 @@ class Rave {
 	 *
 	 */
 	public static function shake($arr) {
+		
 		return array_filter(self::dubstep('is_string', 'trim', $arr));
 	}
 
@@ -582,6 +609,7 @@ class Rave {
 	 * @return  string  
 	 */
 	public static function bump_and_join($glue = '', $arr, $separator = false, $after = true, $before = false) {
+		
 		return implode((string)$glue, self::bump($arr, $separator, $after, $before)); // string
 	}
 
@@ -613,14 +641,14 @@ class Rave {
 		$grouping = preg_replace('/[^\[\{]/', '', (string)$grouping);
 		
 		$chars = array( 1 => "'", 2 => '"' );  // Allowed quote characters. (single or double)
-		$quote = isset($chars[$quote]) ? $chars[$quote] : $chars[1]; // Default to 1. (single)
+		$quote = isset($chars[$quote]) ? $chars[$quote] : $chars[2]; // Default to 2. (double)
 		
 		if ( '{' === $grouping ) { // Objects
 			$data = self::bump($data, ': ' . $quote);
 		}
 		
 		else {
-			$grouping	= '['; // Other Types => Array
+			$grouping = '['; // Other Types => Array
 			$data = self::affix($data, $quote, $quote);
 		}
 	
@@ -688,7 +716,8 @@ class Rave {
 	 * @param   string    $attr
 	 * @return  string
 	 */
-	public static function data_to_json($data, $attr = false) {	
+	public static function data_to_json($data, $attr = false) {
+		
 		if ( empty($data) || !is_array($data) ) {
 			$json = '{}'; 
 		}
