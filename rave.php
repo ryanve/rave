@@ -79,7 +79,8 @@ class Rave {
 	public static function is_dust($ukn) {
 		// In the third test, replace whitespaces with # to make them punctuation so they'll count
 		// as dust. The array was derived from the list @link php.net/manual/en/function.trim.php
-		return isset($ukn) && is_string($ukn) && ctype_punct(str_replace(array(' ', "\s", "\t", "\n", "\r", "\0", "\x0B"), '#', $ukn));
+		$whitespace = array(' ', "\s", "\t", "\n", "\r", "\0", "\x0B");
+		return isset($ukn) && is_string($ukn) && ctype_punct(str_replace($whitespace, '#', $ukn));
 	}
 
 
@@ -226,7 +227,8 @@ class Rave {
 		                    );
 		return isset($conversions[$char]) ? $conversions[$char] : $char;
 	}
-	
+
+
 	/**
 	 * Rave::sanitize                      Sanitize a string, with options.
 	 *
@@ -599,7 +601,7 @@ class Rave {
 	 *                                 represent literals such as functions, '[arrays]', {objects}, 
 	 *                                 numbers, 'true', 'undefined', 'false', 'null' are not quoted.
 	 *                                 
-	 * @return  string|false           formatted JavaScript or false for invalid input.
+	 * @return  string|false           formatted JavaScript, or false for invalid input.
 	 */
 	public static function data_to_js($data, $grouping = '[', $quote = '"') {
 	
