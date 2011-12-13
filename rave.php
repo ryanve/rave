@@ -11,7 +11,8 @@
  
 if (!class_exists('Rave')) {
 class Rave {
-  
+
+
 	/**
 	 * Rave::is_human        Test if an unknown variable is a type for humans: string or numeric.
 	 * @param    mixed       $ukn is the unknown that you want to test.
@@ -23,7 +24,8 @@ class Rave {
 		// http://dev.airve.com/demo/speed_tests/php_is_scalar_not_bool.php
 		return isset($ukn) && is_scalar($ukn) && true !== $ukn; // boolean
 	}
-	
+
+
 	/**
 	 * Rave::humanize            Test input with Rave::is_human. Return humans unchanged.
 	 *                           Convert non humans to ''.
@@ -40,7 +42,8 @@ class Rave {
 	public static function humanize($ukn) {
 		return self::is_human($ukn) ? $ukn : '';
 	}
-	
+
+
 	/**
 	 * Rave::can_breakitdown      Test if an unknown variable can be used as a delimiter, such 
 	 *                            as you'd need to explode a string (break it down into parts).
@@ -63,7 +66,8 @@ class Rave {
 	public static function can_breakitdown($ukn) {
 		return self::is_human($ukn) && '' !== $ukn; // boolean
 	}
-	
+
+
 	/**
 	 * Rave::is_dust             Test for strings that consist only of punctuation and/or whitespace characters.
 	 *                           
@@ -77,7 +81,8 @@ class Rave {
 		// as dust. The array was derived from the list @link php.net/manual/en/function.trim.php
 		return isset($ukn) && is_string($ukn) && ctype_punct(str_replace(array(' ', "\s", "\t", "\n", "\r", "\0", "\x0B"), '#', $ukn));
 	}
-	
+
+
 	/**
 	 * Rave::is_void         Test for empty inputs, pure whitespace, or non strings.
 	 *                           
@@ -89,6 +94,7 @@ class Rave {
 	public static function is_void($ukn) {
 		return !isset($ukn) || !is_string($ukn) || '' === trim($ukn); // boolean
 	}
+
 
 	/**
 	 * Rave::is_literal
@@ -108,7 +114,8 @@ class Rave {
 			return 1 === preg_match( '/^true$|^false$|^\'.*\'$|^\".*\"$|^\[.*\]$|^\{.*\}$|^\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*$|^undefined$|^null$/i', trim((string)$ukn) );
 		}
 	}
-	
+
+
 	/**
 	 * Rave::ok_id                     Test if a string is a valid identifier for data keys, CSS, or other
 	 *                                 purposes. Allows letters (upper and lower), digits, dashes, and 
@@ -133,6 +140,7 @@ class Rave {
 		return !self::is_void($ukn) && 0 === preg_match('/^[^a-zA-Z_]|[^a-zA-Z0-9_\-]/', $ukn);
 	}
 
+
 	/**
 	 * Rave::ok_var
 	 */	
@@ -140,6 +148,7 @@ class Rave {
 		// First char must be letter or underscore. Allow alpanumeric|underscore in the rest.
 		return !self::is_void($ukn) && 0 === preg_match('/^[^a-zA-Z_]|[^a-zA-Z0-9_]/', $ukn);
 	}
+
 
 	/**
 	 * Rave::to_var
@@ -184,7 +193,8 @@ class Rave {
 			return implode('_', $parts); // Not CamelCase. Join  w/ underscore.
 		}
 	}
-		
+
+
 	/**
 	 * Rave::cdata               Wrap code in CDATA tags.
 	 *
@@ -195,23 +205,25 @@ class Rave {
 		return isset($code) ? '/*<![CDATA[*/' . $break . $code . $break . $indent . '/*]]>*/' : $code;
 	}
 
+
 	/**
-	* Rave::mirror           Convert left bracket to right bracket or right bracket to left bracket.
-	*
-	* @param   string|mixed  $char
-	* @return  string|mixed
-	*
-	*/
+	 * Rave::mirror                   Convert left bracket to right bracket or right bracket to left bracket.
+	 *
+	 * @param   string|mixed   $char  A single bracket (or parenthesis) to get the mirror for. Intended for 
+	 *                                strings and will not affect other types.
+	 * @return  string|mixed          the opposite bracket (or unchaged $char if not a bracket)
+	 *
+	 */
 	public static function mirror($char) {
 		$conversions = array( '[' => ']'
-							, '{' => '}'
-							, ']' => '['
-							, '}' => '{'
-							, '(' => ')'
-							, ')' => '('
-							, '<' => '>'
-							, '>' => '<'
-							);
+		                    , '{' => '}'
+		                    , ']' => '['
+		                    , '}' => '{'
+		                    , '(' => ')'
+		                    , ')' => '('
+		                    , '<' => '>'
+		                    , '>' => '<'
+		                    );
 		return isset($conversions[$char]) ? $conversions[$char] : $char;
 	}
 	
@@ -252,6 +264,7 @@ class Rave {
 		// Replace entities, then octets, then anything not alphanumeric|underscore|dash|space.
 		return preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^a-zA-Z0-9_\- \s]/', $other, $str);
 	}
+
 		
 	/**
 	 * Rave::pad
@@ -285,21 +298,23 @@ class Rave {
 			return $left . $str . $left; 
 		}
 	}
-	
+
+
 	/** 
 	 * Rave::quote                        Quote strings, except ones not meant to be quoted in Javascript. 
 	 *                                    Intended for quoting PHP strings containing JavaScript code.
 	 *                          
 	 * @param    string|mixed   $code
 	 * @param    string         $quote
-	 * @return   boolean
+	 * @return   string|mixed             the quoted string, or the original input if it wasn't a string, or if
+	 *                                    it's a string representing a JavaScript literal (see: Rave::is_literal)
 	 *
 	 * @example #TODO
 	 * 
 	 *
 	 */
 	public static function quote($code, $quote = '"') {
-		if ( self::is_void($quote) || self::is_literal($code) ) { 
+		if ( !isset($code) || !is_string($code) || self::is_literal($code) ) { 
 			return $code; 
 		}
 		else {
@@ -308,6 +323,7 @@ class Rave {
 
 		}
 	}
+
 
 	/** 
 	 * Rave::rebound                 Remove quotes that surround strings not needing quotes in JavaScript, such 
@@ -328,6 +344,7 @@ class Rave {
 		//                      quote   [arr]| {obj}|true|false| This part covers anonymous functions, function literals, and common function wrappers.   |null|undefined| +-numbers/decimals   quote
 		return preg_replace( '/(\'|\")(\[.*\]|\{.*\}|true|false|\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*|null|undefined|\-?[0-9]*[\.]?[0-9]+)(\'|\")/i', '$2', (string)$js );
 	}
+
 
 	/**
 	 * Rave::unfold
@@ -356,6 +373,7 @@ class Rave {
 		return $wrap . $js . $wrap;
 	}
 
+
 	/**
 	 * Rave::affix                              Iterate through an array to prepend and/or append each 
 	 *                                          of its values. Works like Rave::pad, but for arrays. It's
@@ -380,7 +398,8 @@ class Rave {
 		}
 		return $arr;
 	}
-	
+
+
 	/**
 	 * Rave::to_array                Convert anything to an array. It's useful when sending an unknown 
 	 *                               type to a loop or array function. Its best application is writing 
@@ -413,7 +432,8 @@ class Rave {
 		}
 	}
 
-		/**
+
+	/**
 	 * Rave::dubstep 
 	 * 
 	 * @param    callback|true   $test             is the conditional test to do on each item of $array
@@ -456,23 +476,25 @@ class Rave {
 		return $array;
 	}
 
+
 	/**
 	 * Rave::shake                  Removes null|whitespace|''|false values from an array. Shake does what
 	 *                              what the default array_filter does and also removes whitespace strings.
 	 *
 	 * @param   array    $arr
-	 * @return  array
+	 * @return  array               the updated array
 	 *
 	 */
 	public static function shake($arr) {
 		return array_filter(self::dubstep('is_string', 'trim', $arr));
 	}
-	
+
+
 	/**
 	 * Rave::remix          TODO
 	 *
 	 * @param   mixed       $arg1, $arg2...
-	 * @return  array
+	 * @return  array       the merged array
 	 *
 	 */
 	public static function remix() {
@@ -487,6 +509,7 @@ class Rave {
 		// Merge the arrays into one.
 		return call_user_func_array('array_merge', $args); 
 	}
+
 
 	/**
 	 * Rave::hook_up                                TODO
@@ -513,7 +536,8 @@ class Rave {
 		// Remove duplicates and join the values into a string connected by $glue.
 		return implode($glue, array_unique($args));
 	}
-	
+
+
 	/**
 	 * Rave::bump                            TODO
 	 *
@@ -548,6 +572,7 @@ class Rave {
 		return $bump; // array
 	}
 
+
 	/**
 	 * Rave::bump_and_join              Do Rave::bump and then join (implode).
 	 *
@@ -557,7 +582,8 @@ class Rave {
 	public static function bump_and_join($glue = '', $arr, $separator = false, $after = true, $before = false) {
 		return implode((string)$glue, self::bump($arr, $separator, $after, $before)); // string
 	}
-		
+
+
 	## Methods below here are in development and need testing ##
 	
 	/**
@@ -598,7 +624,8 @@ class Rave {
 	
 		return self::rebound( $grouping . implode(', ', $data) . self::mirror($grouping) );
 	}
-	
+
+
 	/**
 	 * Rave::each_to_js                Multidimensional version of Rave::data_to_js
 	 *
@@ -649,6 +676,7 @@ class Rave {
 		return self::data_to_js($data, $grouping[$i], $quote); // string
 		
 	}
+
 
 	/**
 	 * Rave::data_to_json           Convert data to JSON.
