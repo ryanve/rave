@@ -223,7 +223,7 @@ class Rave {
 	 *
 	 * @param   string|mixed   $char  A single bracket (or parenthesis) to get the mirror for. Intended for 
 	 *                                strings and will not affect other types.
-	 * @return  string|mixed          the opposite bracket (or unchaged $char if not a bracket)
+	 * @return  string|mixed          the opposite bracket (or unchanged $char if not a bracket)
 	 *
 	 */
 	public static function mirror($char) {
@@ -249,13 +249,13 @@ class Rave {
 	 * @param   string            $space   is the whitespace replacement. By default '-' is used so that
 	 *                                     whitespace is replaced by dashes. To allow whitespace, set to false.
 	 * @param   callback|boolean  $filter  is an optional callback function to apply to $str. When omitted or set
-	 *                                     to true, the default 'mb_strtolower' is used to force lowercase. You
+	 *                                     to true, the it defaults to 'mb_strtolower' for forcing lowercase. You
 	 *                                     can override w/ a different callback, or, for none, set to false.
  	 * @param   string            $other   is the replacement for other illegal characters. Default: ''
 	 * @return  string|mixed               is the sanitized string (or the original input if it wasn't a string)
 	 *                            
 	 */
-	public static function sanitize($str, $space = '-', $filter = 'mb_strtolower', $other = '') {
+	public static function sanitize($str, $space = '-', $filter = true, $other = false) {
 	
 		if (!isset($str) || !is_string($str)) {
 			return $str; // Return unchanged.
