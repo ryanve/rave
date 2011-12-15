@@ -358,8 +358,8 @@ class Rave {
 	 */
 	public static function rebound($js) {
 		//                     ( $1  )( ===================================================================  $2  ============================================================================ )( $3  )
-		//                      quote   [arr]| {obj}|true|false| This part covers anonymous functions, function literals, and common function wrappers.   |null|undefined| +-numbers/decimals   quote
-		return preg_replace( '/(\'|\")(\[.*\]|\{.*\}|true|false|\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*|null|undefined|\-?[0-9]*[\.]?[0-9]+)(\'|\")/i', '$2', (string)$js );
+		//                      quote   [arr]inner | {obj}inner | [arr]| {obj}|true|false| This part covers anonymous functions, function literals, and common function wrappers.   |null|undefined| +-numbers/decimals   quote
+		return preg_replace( '/(\'|\")(\[[^\[\]]*\]|\{[^\}\}]*\}|\[.*\]|\{.*\}|true|false|\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*|null|undefined|\-?[0-9]*[\.]?[0-9]+)(\'|\")/i', '$2', (string)$js );
 	}
 
 
