@@ -22,7 +22,6 @@ class Rave {
 	public static function is_human($ukn) {
 		// Equivalent to ( is_string($ukn) || is_numeric($ukn) ) but faster.
 		// http://dev.airve.com/demo/speed_tests/php_is_scalar_not_bool.php
-		return isset($ukn) && is_scalar($ukn) && true !== $ukn; // boolean
 		return isset($ukn) && (is_string($ukn) || is_numeric($ukn)); // boolean
 	}
 
