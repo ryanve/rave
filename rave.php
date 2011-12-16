@@ -23,6 +23,7 @@ class Rave {
 		// Equivalent to ( is_string($ukn) || is_numeric($ukn) ) but faster.
 		// http://dev.airve.com/demo/speed_tests/php_is_scalar_not_bool.php
 		return isset($ukn) && is_scalar($ukn) && true !== $ukn; // boolean
+		return isset($ukn) && (is_string($ukn) || is_numeric($ukn)); // boolean
 	}
 
 
@@ -693,6 +694,10 @@ class Rave {
 			$count = count($grouping);         // Count array items.
 		}
 		
+		// The part below doesn't completely work. It could be done with a more complicated
+		// loop and use of array_walk_recursive, but we should remove this function and
+		// instead use PHP's built-in json_encode() function for this sort of thing.
+		
 		// Loop backwards through $grouping (working in to out).
 		// Stop at index 2 so we can do the outermost pass separately.
 		for ($i = $count; $i >= 2; $i--) {
@@ -709,24 +714,18 @@ class Rave {
 
 
 	/**
-	 * Rave::data_to_json           Convert data to JSON.
+	 * Rave::data_to_json               Convert data to JSON.
 	 *
-	 * @param   array     $data     is the data you want to convert into JSON. It should be an associative
-	 *                              array, b/c the array keys are used as the JSON object property names.
-	 * @param   string    $attr
+	 * @param   mixed         $data     is the data you want to convert into JSON. It can be any type except a
+	 *                                  resource. Array keys on associative arrays become JSON property names.
+	 * @param   string|false  $attr  
+	 * @param   int|flag      $options  is the $options parameter for json_encode()
 	 * @return  string
 	 */
-	public static function data_to_json($data, $attr = false) {
-		
-		if ( empty($data) || !is_array($data) ) {
-			$json = '{}'; 
-		}
-		else {
-			$data = self::bump($data, '": "', true, true); // JSON needs double quotes.
-			$json = self::rebound('{' . implode(',', $data) . '}');
-		}
+	public static function data_to_json($data, $attr = false, $options = 0) {
+		$json = json_encode($json, $options);
 		return self::ok_id($attr) ? $attr . "='" . $json . "'" : $json;
-	}	
+	}
 
 }//class
 }//if
