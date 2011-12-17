@@ -5,7 +5,7 @@
  * @author Ryan Van Etten (c) 2011
  * @license https://github.com/ryanve/ravephp
  * @requires PHP 5.2.3+
- * @version 0.9.0
+ * @version 0.9.1
  * @license MIT
  */
  
@@ -209,11 +209,16 @@ class Rave {
 	/**
 	 * Rave::cdata               Wrap code in CDATA tags.
 	 *
+ 	 * CDATA is needed in XHTML but not HTML. We probably don't need this
+	 * function and may remove it before first major version. See:
+	 * http://stackoverflow.com/questions/4339702/what-is-the-meaning-of-cdata
+	 * https://developer.mozilla.org/en/Writing_JavaScript_for_XHTML
+	 *
 	 * @param   string   $code   is the code (usually JavaScript) that you want to wrap.
 	 * @return  string           is the wrapped code
 	 */
 	public static function cdata($code, $break = "\n", $indent = "\t") {
-		
+
 		return isset($code) ? '/*<![CDATA[*/' . $break . $code . $break . $indent . '/*]]>*/' : $code;
 	}
 
@@ -251,11 +256,10 @@ class Rave {
 	 * @param   callback|boolean  $filter  is an optional callback function to apply to $str. When omitted or set
 	 *                                     to true, the it defaults to 'mb_strtolower' for forcing lowercase. You
 	 *                                     can override w/ a different callback, or, for none, set to false.
- 	 * @param   string            $other   is the replacement for other illegal characters. Default: ''
 	 * @return  string|mixed               is the sanitized string (or the original input if it wasn't a string)
 	 *                            
 	 */
-	public static function sanitize($str, $space = '-', $filter = true, $other = false) {
+	public static function sanitize($str, $space = '-', $filter = true) {
 	
 		if (!isset($str) || !is_string($str)) {
 			return $str; // Return unchanged.
@@ -271,13 +275,10 @@ class Rave {
 		}
 		
 		// Replace all inner whitespace chars w/ $space, provided $space is a string.
-		isset($space) && is_string($space) and $str = preg_replace('/[ \s\t\n\r\0\x0B]+/', $space, $str);
-		
-		// If $other is not a string, reset it to an empty string.
-		isset($other) && is_string($other) or $other = '';
+		is_string($space) and $str = preg_replace('/[ \s\t\n\r\0\x0B]+/', $space, $str);
 		
 		// Replace entities, then octets, then anything not alphanumeric|underscore|dash|space.
-		return preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^a-zA-Z0-9_\- \s]/', $other, $str);
+		return preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^a-zA-Z0-9_\- \s]/', '', $str);
 	}
 
 		
