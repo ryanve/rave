@@ -489,6 +489,21 @@ class Rave {
 	}
 	
 	/**
+	 * Rave::call
+	 *
+	 * @param   string    $callback      the name of the JavaScript callback
+	 * @param   string    $args          args to pass to $callback
+	 * @return  string
+	 * Rave::call('doExample', $arg1, $arg2,... )
+	 */
+	 
+	public static function call() {
+		$args = func_get_args();
+		$callback = array_shift($args);
+		return $callback . self::parenthesize(implode(',',$args)) . ';';
+	}
+	
+	/**
 	 * Rave::unfold                  Unfold a block of (JavaScript) code. (Add line breaks and tabs.)
 	 *
 	 * @param   string    $js        is the code (usually JavaScript) to unfold.
