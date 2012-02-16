@@ -5,7 +5,7 @@
  * @author Ryan Van Etten (c) 2011
  * @license https://github.com/ryanve/ravephp
  * @requires PHP 5.2.3+
- * @version 0.9.1
+ * @version 0.9.2
  * @license MIT
  */
  
@@ -19,6 +19,7 @@ class Rave {
 	 * @return   boolean     true  for strings|numbers (including '' and 0)
 	 *                       false for arrays|objects|null|booleans
 	 */
+	 
 	public static function is_human($ukn) {
 		// Equivalent to ( is_string($ukn) || is_numeric($ukn) ) but faster.
 		// http://dev.airve.com/demo/speed_tests/php_is_scalar_not_bool.php
@@ -40,6 +41,7 @@ class Rave {
 	 *  Rave::humanize(true)      #  ''
 	 *  Rave::humanize(0)         #  0
 	 */
+	 
 	public static function humanize($ukn) {
 		return self::is_human($ukn) ? $ukn : '';
 	}
@@ -64,6 +66,7 @@ class Rave {
 	 *  Rave::can_breakitdown(1.5)      // true
 	 *  Rave::can_breakitdown(0)        // true
 	 */
+	 
 	public static function can_breakitdown($ukn) {
 		return self::is_human($ukn) && '' !== $ukn; // boolean
 	}
@@ -76,7 +79,8 @@ class Rave {
 	 * @return  boolean          true  for strings that contain only whitespace or punctuation characters.
 	 *                           false for non-strings and strings containing letters or numbers.
 	 *                           
-	 */	
+	 */
+	 
 	public static function is_dust($ukn) {
 		// In the third test, replace whitespaces with # to make them punctuation so they'll count
 		// as dust. The array was derived from the list @link php.net/manual/en/function.trim.php
@@ -93,6 +97,7 @@ class Rave {
 	 *                           false for non-empty non-whitespace strings
 	 *                           
 	 */
+	 
 	public static function is_void($ukn) {
 		
 		return !isset($ukn) || !is_string($ukn) || '' === trim($ukn); // boolean
@@ -105,6 +110,7 @@ class Rave {
 	 * @param    string|mixed
 	 * @return   boolean
 	*/
+	
 	public static function is_literal($ukn) {
 		
 		if ( !isset($ukn) ) {
@@ -118,7 +124,20 @@ class Rave {
 			return 1 === preg_match( '/^true$|^false$|^\'.*\'$|^\".*\"$|^\[.*\]$|^\{.*\}$|^\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*$|^undefined$|^null$/i', trim((string)$ukn) );
 		}
 	}
+	
+	/**
+	 * Rave::word                       Convert true to 'true', false to 'false', and null to 'null'
+	 *                                  Otherwise returns $ukn as is.
+	 *
+	 * @param   mixed           $ukn
+	 *
+	 * @return  string|mixed
+	 */
 
+	public static function word($ukn) {
+		$word = array_search($ukn, array('true' => true, 'false' => false, 'null' => null));
+		return !empty($word) ? $word : $ukn;
+	}
 
 	/**
 	 * Rave::ok_id                     Test if a string is a valid identifier for data keys, CSS, or other
@@ -138,7 +157,8 @@ class Rave {
 	 *  Rave::ok_id('7seconds')   #  false
 	 *  Rave::ok_id('yes&no')     #  false
 	 *
-	 */	
+	 */
+
 	public static function ok_id($ukn) {
 		
 		// First char must be letter or underscore. Allow alpanumeric|dash|underscore in the rest.
@@ -151,7 +171,8 @@ class Rave {
 	 * 
 	 * @param   mixed     $ukn   is the unknown variable to test.
 	 * @return  boolean          true if okay, false if not.
-	 */	
+	 */
+
 	public static function ok_var($ukn) {
 		
 		// First char must be letter or underscore. Allow alpanumeric|underscore in the rest.
@@ -169,7 +190,8 @@ class Rave {
 	 *
 	 *
 	 *
-	 */		
+	 */
+
 	public static function to_var($str, $camelcase = false, $offset = 1) {
 	
 		if ( self::is_void($str) || !is_scalar($str) || true === $str ) {
@@ -217,6 +239,7 @@ class Rave {
 	 * @param   string   $code   is the code (usually JavaScript) that you want to wrap.
 	 * @return  string           is the wrapped code
 	 */
+
 	public static function cdata($code, $break = "\n", $indent = "\t") {
 
 		return isset($code) ? '/*<![CDATA[*/' . $break . $code . $break . $indent . '/*]]>*/' : $code;
@@ -231,6 +254,7 @@ class Rave {
 	 * @return  string|mixed          the opposite bracket (or unchanged $char if not a bracket)
 	 *
 	 */
+
 	public static function mirror($char) {
 		
 		$conversions = array( '[' => ']'
@@ -259,6 +283,7 @@ class Rave {
 	 * @return  string|mixed               is the sanitized string (or the original input if it wasn't a string)
 	 *                            
 	 */
+
 	public static function sanitize($str, $space = '-', $filter = true) {
 	
 		if (!isset($str) || !is_string($str)) {
@@ -281,18 +306,43 @@ class Rave {
 		return preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^a-zA-Z0-9_\- \s]/', '', $str);
 	}
 
+	/**
+	 * Rave::trim                Trim whitespace plus (optional) specified left and right trim chars
+	 * 
+	 * @param   string   $str    is a string that you want to trin. Inputs that aren't
+	 *                           strings are ignored and returned as is (w/o error).
+	 * @param   string   $left   optional additional characters to trim from left side
+	 * @param   string   $right  optional additional characters to trim from right side
+	 *
+	 * @return  string|mixed     the updated string (or the unchanged input $str if it was not a string)
+	 */
+
+	public static function trim($str, $left = false, $right = true) {
+	
+		if (!isset($str) || !is_string($str)) {
+			return $str;  // Return unchanged if wrong type.
+		}
 		
+		$str = trim((string)$str);
+		
+		isset($left) && is_string($left) and $str = ltrim($str, $left);
+		isset($right) && is_string($right) and $str = rtrim($str, $right);
+		
+		return $str;
+	}
+	
 	/**
 	 * Rave::pad
 	 *
-	 * @param   string|number   $str is the input that you want to pad. Inputs that aren't
-	 *                          strings or numbers are ignored and returned as is (w/o error).
-	 * @param   string|number   $left is the padding to add to the left. 
+	 * @param   string|number   $str    is the input that you want to pad. Inputs that aren't
+	 *                                  strings or numbers are ignored and returned as is (w/o error).
+	 * @param   string|number   $left   is the padding to add to the left. 
 	 *
 	 * @example #TODO
 	 *  Rave::pad()  #
 	 *  Rave::pad()  #
 	 */
+
 	public static function pad($str, $left = false, $right = true) {
 	
 		if ( !self::is_human($str) ) { 
@@ -315,7 +365,6 @@ class Rave {
 		}
 	}
 
-
 	/** 
 	 * Rave::quote                        Quote strings, except ones not meant to be quoted in Javascript. 
 	 *                                    Intended for quoting PHP strings containing JavaScript code.
@@ -329,6 +378,7 @@ class Rave {
 	 * 
 	 *
 	 */
+
 	public static function quote($code, $quote = '"') {
 		
 		if ( !isset($code) || !is_string($code) || self::is_literal($code) ) { 
@@ -357,13 +407,87 @@ class Rave {
 	 *  Rave::reboud('"1000"')  #  '1000'
 	 *
 	 */
+
 	public static function rebound($js) {
 		//                     ( $1  )( ===================================================================  $2  ============================================================================ )( $3  )
 		//                      quote   [arr]inner | {obj}inner | [arr]| {obj}|true|false| This part covers anonymous functions, function literals, and common function wrappers.   |null|undefined| +-numbers/decimals   quote
 		return preg_replace( '/(\'|\")(\[[^\[\]]*\]|\{[^\}\}]*\}|\[.*\]|\{.*\}|true|false|\s*((\$|jQuery)\([a-z]+\)\.[a-z]+)?\(?\s*function[a-z0-9_\s]*\(.*\}\s*\)?\s*\(?.*\)?\;?\s*|null|undefined|\-?[0-9]*[\.]?[0-9]+)(\'|\")/i', '$2', (string)$js );
 	}
+	
+	/**
+	 * Rave::parenthesize
+	 *
+	 * @param   string    $str              is a string you want to add parens to.
+	 * @param   boolean   $trim_existing    optional (defaults to true) trims any existing parens.
+	 * @return  string
+	 */
 
+	public static function parenthesize($str, $trim_existing = true) {
+		true === $trim_existing and $str = self::trim($str, '(', ')');
+		return '(' . $str . ')';
+	}
+	
+	/**
+	 * Rave::bracketize                     Add curly brackets to a string.
+	 *                                      (For adding square brackets, use Rave::arrayify or Rave::pad)
+	 *
+	 * @param   string    $str              is a string you want to add curly brackets to.
+	 * @param   boolean   $trim_existing    optional (defaults to true) trims any existing curly brackets.
+	 * @return  string
+	 */
 
+	public static function bracketize($str, $trim_existing = true) {
+		true === $trim_existing and $str = self::trim($str, '{', '}');
+		return '{' . $str . '}';
+	}
+	
+	/**
+	 * Rave::arrayify                           Formal $input into a JavaScript array.
+	 *                                          See also: Rave::to_array 
+	 *                                          See also: json_encode (on php.net)
+	 *
+	 * @param   mixed          $input            
+	 *                                           
+	 *
+	 * @param   boolean        $trim_existing    optional (defaults to true)
+	 * @return  string
+	 */
+
+	public static function arrayify($input, $quote_strings = true) {
+	
+		if ( is_scalar($input) ) {
+			
+			if ( is_string($input) ) {
+				$quote_strings and $input = self::quote($input);
+			}
+			
+			else {
+				$input = self::word($input);
+			}
+		}
+		
+		else {
+				$input = self::to_array($input);
+				true === $quote_strings and $input = array_map('Rave::quote', $input);
+				$input = implode(',', $input);
+		}
+		
+		return '[' . $input . ']';
+	}
+	
+	/**
+	 * Rave::closure
+	 *
+	 * @param   string    $params         comma-separated vars
+	 * @param   string    $content        the function content
+	 * @param   string    $invoke         comma-separated vars
+	 * @return  string
+	 */
+	 
+	public static function closure($params = '', $content = '', $invoke = '') {
+		return self::parenthesize('function' . self::parenthesize($params) . self::bracketize($content) . self::parenthesize($invoke), false);
+	}
+	
 	/**
 	 * Rave::unfold                  Unfold a block of (JavaScript) code. (Add line breaks and tabs.)
 	 *
@@ -375,6 +499,7 @@ class Rave {
 	 * @return  string               is the unfolded code.
 	 * 
 	 */
+
 	public static function unfold($js, $break = "\n", $indent = "\t", $offset = "\t", $wrap = "\n\t") {
 		
 		$break .= $offset; // Keep offset param separate for future options.
@@ -415,6 +540,7 @@ class Rave {
 	 * @return  array                           the updated array, or unchanged $arr for non-arrays.
 	 *
 	 */
+
 	public static function affix($arr, $left = false, $right = true) {
 		
 		if ( isset($arr) && is_array($arr) ) {
@@ -428,9 +554,10 @@ class Rave {
 
 
 	/**
-	 * Rave::to_array                Convert anything to an array. It's useful when sending an unknown 
+	 * Rave::to_array                Convert any PHP type to a PHP array. It's useful when sending an unknown 
 	 *                               type to a loop or array function. Its best application is writing 
-	 *                               functions that support mixed inputs.
+	 *                               functions that support mixed inputs. See also: Rave::arrayify
+	 *
 	 * @param   mixed    $ukn        is the variable of unknown type that you to convert to an array.
 	 * @param   string   $delimiter  is an optional delimiter used to explode string|numeric inputs.
 	 *
@@ -441,7 +568,8 @@ class Rave {
 	 *  Rave::to_array('abc', 'b')    #  array('a', 'c')   // exploded to array
 	 *  Rave::to_array(array('abc'))  #  array('abc')      // already an array
 	 *
-	*/
+	 */
+
 	public static function to_array($ukn, $delimiter = false) {
 	
 		// Explode strings|numbers when delimiter is supplied.
@@ -476,6 +604,7 @@ class Rave {
 	 * @return   array
 	 *
 	 */
+
 	public static function dubstep($test, $callback, $array) {
 	
 		// We want people to know if they're doing it wrong and why.
@@ -514,6 +643,7 @@ class Rave {
 	 * @return  array               the updated array
 	 *
 	 */
+
 	public static function shake($arr) {
 		
 		return array_filter(self::dubstep('is_string', 'trim', $arr));
@@ -527,6 +657,7 @@ class Rave {
 	 * @return  array       the merged array
 	 *
 	 */
+
 	public static function remix() {
 		
 		$args = func_get_args();
@@ -550,6 +681,7 @@ class Rave {
 	 * @param  	mixed          $lips1, $lips2...    can be a mix of arrays, strings, or numbers to join.
   	 * @return  string
 	 */
+
 	public static function hook_up() {
 	
 		// Get inputs as array. Remove first arg for glue.
@@ -576,6 +708,7 @@ class Rave {
 	 * @param   string|boolean   $after
 	 * @param   string|boolean   $before
 	 */
+
 	public static function bump($arr, $separator = false, $after = true, $before = false) {
 	
 		// Reset separator to '' if not string|number one char or longer.
@@ -609,6 +742,7 @@ class Rave {
 	 * @param   string|number   $glue   Is the implode glue. (php.net/manual/en/function.implode.php)
 	 * @return  string  
 	 */
+
 	public static function bump_and_join($glue = '', $arr, $separator = false, $after = true, $before = false) {
 		
 		return implode((string)$glue, self::bump($arr, $separator, $after, $before)); // string
@@ -632,6 +766,7 @@ class Rave {
 	 *                                 
 	 * @return  string|false           formatted JavaScript, or false for invalid input.
 	 */
+
 	public static function data_to_js($data, $grouping = '[', $quote = '"') {
 	
 		if ( !isset($data) || !is_array($data) ) {
@@ -673,6 +808,7 @@ class Rave {
 	 * @return  string|false           formatted JavaScript or false for invalid input.
 	 * 
 	 */
+
 	public static function each_to_js($data, $grouping = '[', $quote = '"') {
 	
 		if ( !isset($data) || !is_array($data) ) {
@@ -722,6 +858,7 @@ class Rave {
 	 * @param   int|flag      $options  is the $options parameter for json_encode()
 	 * @return  string
 	 */
+
 	public static function data_to_json($data, $attr = false, $options = 0) {
 		$json = json_encode($json, $options);
 		return self::ok_id($attr) ? $attr . "='" . $json . "'" : $json;
