@@ -227,25 +227,6 @@ class Rave {
 		}
 	}
 
-
-	/**
-	 * Rave::cdata               Wrap code in CDATA tags.
-	 *
- 	 * CDATA is needed in XHTML but not HTML. We probably don't need this
-	 * function and may remove it before first major version. See:
-	 * http://stackoverflow.com/questions/4339702/what-is-the-meaning-of-cdata
-	 * https://developer.mozilla.org/en/Writing_JavaScript_for_XHTML
-	 *
-	 * @param   string   $code   is the code (usually JavaScript) that you want to wrap.
-	 * @return  string           is the wrapped code
-	 */
-
-	public static function cdata($code, $break = "\n", $indent = "\t") {
-
-		return isset($code) ? '/*<![CDATA[*/' . $break . $code . $break . $indent . '/*]]>*/' : $code;
-	}
-
-
 	/**
 	 * Rave::mirror                   Convert left bracket to right bracket or right bracket to left bracket.
 	 *
@@ -317,7 +298,7 @@ class Rave {
 	 * @return  string|mixed     the updated string (or the unchanged input $str if it was not a string)
 	 */
 
-	public static function trim($str, $left = false, $right = true) {
+	public static function trim($str, $left = false, $right = false) {
 	
 		if (!isset($str) || !is_string($str)) {
 			return $str;  // Return unchanged if wrong type.
