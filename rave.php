@@ -2,11 +2,11 @@
 /**
  * RavePHP is a lightweight PHP utility class that you can dance to. It provides 
  * formatting methods to help you mix HTML/JS/PHP like an underground DJ.
- * @author Ryan Van Etten (c) 2011
- * @license https://github.com/ryanve/ravephp
- * @requires PHP 5.2.3+
- * @version 0.9.2
- * @license MIT
+ * @author     Ryan Van Etten (c) 2011
+ * @link       https://github.com/ryanve/rave
+ * @requires   PHP 5.2.3+
+ * @version    0.9.3
+ * @license    MIT
  */
  
 if (!class_exists('Rave')) {
